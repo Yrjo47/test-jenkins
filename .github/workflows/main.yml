@@ -1,0 +1,13 @@
+name: Trigger Jenkins on PR Open
+on:
+  pull_request:
+    types: [opened]  # Only runs when a PR is opened
+
+jobs:
+  trigger-jenkins:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Jenkins
+        run: |
+          curl -X POST \
+            "https://https://98kk89-31-173-86-177.ru.tuna.am//job/build_on_pull_reques_test/build?token=pr-open-token"
