@@ -9,4 +9,4 @@ jobs:
     steps:
       - name: Notify Jenkins
         run: |
-          curl -X POST "https://98kk89-31-173-86-177.ru.tuna.am/job/build_on_pull_request_test/build?token=pr-open-token"
+          curl -X POST "https://https://o9l4ow-31-173-86-177.ru.tuna.am/job/build_on_pull_request_test/build?token=pr-open-token"
