@@ -1,9 +1,0 @@
-name: test-compose
-
-services:
-  service1: 
-    container_name: service1-container
-    image: alpine
-
-
-  
