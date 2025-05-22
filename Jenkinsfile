@@ -16,9 +16,12 @@ pipeline {
     }
     
     stages {
-        stage('Hello') {
+        stage('Deploy') {
+            when {
+                expression { return env.CHANGE_ID != null }
+            }
             steps {
-                echo 'hello'
+                sh 'echo "new PR $BRANCH_NAME opened"'
             }
             
             // Optional post section
