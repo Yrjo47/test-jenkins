@@ -1,5 +1,9 @@
 pipeline {
     agent any  // Simplified agent declaration
+
+    environment {
+        PLATFORM_PORT = 3000 + CHANGE_ID
+    }
     
     options {
         // More comprehensive build retention
@@ -27,9 +31,39 @@ pipeline {
             }
             steps {
                 sh """
-                    echo "I'm a ${GIT_BRANCH} PR branch"
+                    echo "I'm a ${GIT_BRANCH} PR branch with a ${CHANGE_ID} number. I will be available locally on port ${env.PR_PORT}"
+                """
+            }
+        }
+        stage("Start services") {
+            when {
+                changeRequest()
+            }
+            steps {
+                sh """
+                    HOST_PORT=${PLATFORM_PORT} docker compose up -d
+                """
+            }
+        }
+        stage("Start services") {
+            when {
+                changeRequest()
+            }
+            steps {
+                sh """
+                    curl -X POST "http://localhost:2019/config/apps/http/servers/srv0/routes" \
+                    -H "Content-Type: application/json" \
+                    -d '{
+                        "@id": "domain-localhost-proxy-${CHANGE_ID}",
+                        "match": [{"host": ["${GIT_BRANCH}.localhost"]}],
+                        "handle": [{
+                        "handler": "reverse_proxy",
+                        "upstreams": [{"dial": ":${PLATFORM_PORT}"}]
+                        }]
+                    }'
                 """
             }
         }
     }
 }
+

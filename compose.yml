@@ -3,7 +3,9 @@ name: test-compose
 services:
   service1: 
     container_name: service1-container
-    image: alpine
+    image: nginx
+    ports:
+      - "127.0.0.1:${HOST_PORT}:80"
 
 
   
