@@ -1,0 +1,17 @@
+name: PR Lifecycle Workflow
+
+on:
+  pull_request:
+    types: [opened, closed]
+    branches: [main]
+
+jobs:
+  pr_workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR action
+        run: |
+          curl --header "Content-Type: application/json" \
+          --request POST \
+          --data '{"action":"${{ github.event.action }}"}' \
+          https://y84vfj-31-173-87-165.ru.tuna.am/github-webhook/
