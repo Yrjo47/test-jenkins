@@ -31,7 +31,7 @@ pipeline {
             }
             steps {
                 sh """
-                    echo "I'm a ${GIT_BRANCH} PR branch with a ${CHANGE_ID} number. I will be available locally on port ${env.PR_PORT}"
+                    echo "I'm a ${GIT_BRANCH} PR branch with a ${CHANGE_ID} number. I will be available locally on port ${env.PLATFORM_PORT}"
                 """
             }
         }
