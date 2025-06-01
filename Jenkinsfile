@@ -26,7 +26,7 @@ pipeline {
                 changeRequest()
             }
             steps {
-                sh "echo 'I\'m a ${GIT_BRANCH} PR branch'"
+                sh "echo 'Im a ${GIT_BRANCH} PR branch'"
             }
         }
     }
