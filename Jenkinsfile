@@ -45,7 +45,7 @@ pipeline {
                 """
             }
         }
-        stage("Start services") {
+        stage("Create a dedicated caddy domain") {
             when {
                 changeRequest()
             }
