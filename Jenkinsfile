@@ -16,20 +16,14 @@ pipeline {
     }
     
     stages {
-        stage('Deploy') {
+        stage("For all branches") {
+            sh "echo 'hello'"
+        }
+        stage("For PR branches") {
             when {
-                expression { return env.CHANGE_ID != null }
+                changeRequest()
             }
-            steps {
-                sh 'echo "new PR $BRANCH_NAME opened"'
-            }
-            
-            // Optional post section
-            post {
-                always {
-                    echo "Stage completed"
-                }
-            }
+            sh "echo 'I\'m a PR branch'"
         }
     }
 }
