@@ -16,8 +16,8 @@ pipeline {
         disableConcurrentBuilds()
 
         // Consider adding these common options:
-        timeout(time: 30, unit: 'MINUTES')  // Prevent hung builds
-        timestamps()                        // Add timestamps to logs
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
     }
 
     stages {
