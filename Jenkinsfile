@@ -2,7 +2,7 @@ pipeline {
     agent any  // Simplified agent declaration
 
     environment {
-        PLATFORM_PORT = '3000' + CHANGE_ID
+        PLATFORM_PORT = '3000' + env.CHANGE_ID
     }
 
     options {
