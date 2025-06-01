@@ -2,11 +2,7 @@ pipeline {
     agent any  // Simplified agent declaration
 
     environment {
-<<<<<<< HEAD
-        PLATFORM_PORT = '3000 + env.CHANGE_ID'
-=======
-        PLATFORM_PORT = '3000' + env.CHANGE_ID
->>>>>>> e066a41 (hello)
+        PLATFORM_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
     }
 
     options {
@@ -35,7 +31,7 @@ pipeline {
             }
             steps {
                 sh """
-                    echo "I'm a ${GIT_BRANCH} PR branch with a ${CHANGE_ID} number. I will be available locally on port ${env.PR_PORT}"
+                    echo "I'm a ${GIT_BRANCH} PR branch with a ${CHANGE_ID} number. I will be available locally on port ${env.PLATFORM_PORT}"
                 """
             }
         }
