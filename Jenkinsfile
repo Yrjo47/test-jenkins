@@ -17,13 +17,17 @@ pipeline {
     
     stages {
         stage("For all branches") {
-            sh "echo 'hello'"
+            steps {
+                sh "echo 'hello'"
+            }
         }
         stage("For PR branches") {
             when {
                 changeRequest()
             }
-            sh "echo 'I\'m a PR branch'"
+            steps {
+                sh "echo 'I\'m a PR branch'"
+            }
         }
     }
 }
