@@ -2,9 +2,9 @@ pipeline {
     agent any  // Simplified agent declaration
 
     environment {
-        PLATFORM_PORT = 3000 + CHANGE_ID
+        PLATFORM_PORT = '3000' + CHANGE_ID
     }
-    
+
     options {
         // More comprehensive build retention
         buildDiscarder logRotator(
@@ -13,19 +13,19 @@ pipeline {
             daysToKeepStr: '5'         // Keep build records for 14 days
         )
         disableConcurrentBuilds()
-        
+
         // Consider adding these common options:
         timeout(time: 30, unit: 'MINUTES')  // Prevent hung builds
         timestamps()                        // Add timestamps to logs
     }
-    
+
     stages {
-        stage("For all branches") {
+        stage('For all branches') {
             steps {
                 sh "echo 'hello'"
             }
         }
-        stage("For PR branches") {
+        stage('For PR branches') {
             when {
                 changeRequest()
             }
@@ -35,7 +35,7 @@ pipeline {
                 """
             }
         }
-        stage("Start services") {
+        stage('Start services') {
             when {
                 changeRequest()
             }
@@ -45,7 +45,7 @@ pipeline {
                 """
             }
         }
-        stage("Create a dedicated caddy domain") {
+        stage('Create a dedicated caddy domain') {
             when {
                 changeRequest()
             }
