@@ -1,10 +1,6 @@
 pipeline {
     agent any  // Simplified agent declaration
 
-    environment {
-        PLATFORM_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
-    }
-
     options {
         // More comprehensive build retention
         buildDiscarder logRotator(
@@ -39,6 +35,9 @@ pipeline {
             when {
                 changeRequest()
             }
+            environment {
+                PLATFORM_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
+            }
             steps {
                 sh """
                     HOST_PORT=${PLATFORM_PORT} docker compose up -d
@@ -48,6 +47,9 @@ pipeline {
         stage('Create a dedicated caddy domain') {
             when {
                 changeRequest()
+            }
+            environment {
+                PLATFORM_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
             }
             steps {
                 sh """
