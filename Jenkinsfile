@@ -39,8 +39,9 @@ pipeline {
                 PLATFORM_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
             }
             steps {
+                sh 'echo "starting services..."'
                 sh """
-                    HOST_PORT=${PLATFORM_PORT} docker compose up -d
+                    HOST_PORT=${PLATFORM_PORT} docker compose up -d --build
                 """
             }
         }
@@ -52,18 +53,28 @@ pipeline {
                 PLATFORM_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
             }
             steps {
-                sh """
-                    curl -X POST "http://localhost:2019/config/apps/http/servers/srv0/routes" \
-                    -H "Content-Type: application/json" \
-                    -d '{
-                        "@id": "domain-localhost-proxy-${CHANGE_ID}",
-                        "match": [{"host": ["${GIT_BRANCH}.localhost"]}],
-                        "handle": [{
-                        "handler": "reverse_proxy",
-                        "upstreams": [{"dial": ":${PLATFORM_PORT}"}]
-                        }]
-                    }'
-                """
+                script {
+                    sh """
+                        response=\$(curl -s -o /dev/null -w "%{http_code}" \
+                        "http://localhost:2019/config/apps/http/servers/srv0/routes/domain-localhost-proxy-${CHANGE_ID}")
+
+                        if [ "\$response" -eq 404 ]; then
+                            echo "Creating new Caddy route..."
+                            curl -X POST "http://localhost:2019/config/apps/http/servers/srv0/routes" \
+                            -H "Content-Type: application/json" \
+                            -d '{
+                                "@id": "domain-localhost-proxy-${CHANGE_ID}",
+                                "match": [{"host": ["${GIT_BRANCH}.localhost"]}],
+                                "handle": [{
+                                "handler": "reverse_proxy",
+                                "upstreams": [{"dial": ":${PLATFORM_PORT}"}]
+                                }]
+                            }'
+                        else
+                            echo "No changes to the existing caddy route"
+                        fi
+                    """
+                }
             }
         }
     }
