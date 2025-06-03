@@ -2,7 +2,7 @@ name: test-compose
 
 services:
   service1: 
-    container_name: service1-container
+    container_name: service1-container-${BRANCH_NAME}
     image: nginx
     ports:
       - "127.0.0.1:${HOST_PORT}:80"

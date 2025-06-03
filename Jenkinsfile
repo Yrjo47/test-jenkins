@@ -41,7 +41,7 @@ pipeline {
             steps {
                 sh 'echo "starting services..."'
                 sh """
-                    HOST_PORT=${PLATFORM_PORT} docker compose up -d --build
+                    HOST_PORT=${PLATFORM_PORT} BRANCH_NAME=${GIT_BRANCH} docker compose up -d --build
                 """
             }
         }
@@ -75,6 +75,7 @@ pipeline {
                         fi
                     """
                 }
+                echo "The app is running on https://${GIT_BRANCH}.localhost"
             }
         }
     }
