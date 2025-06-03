@@ -56,14 +56,14 @@ pipeline {
                 script {
                     sh """
                         response=\$(curl -s -o /dev/null -w "%{http_code}" \
-                        "http://localhost:2019/config/apps/http/servers/srv0/routes/domain-localhost-proxy-${CHANGE_ID}")
+                        "http://localhost:2019/id/${CHANGE_ID}")
 
                         if [ "\$response" -eq 404 ]; then
                             echo "Creating new Caddy route..."
                             curl -X POST "http://localhost:2019/config/apps/http/servers/srv0/routes" \
                             -H "Content-Type: application/json" \
                             -d '{
-                                "@id": "domain-localhost-proxy-${CHANGE_ID}",
+                                "@id": "${CHANGE_ID}",
                                 "match": [{"host": ["${GIT_BRANCH}.localhost"]}],
                                 "handle": [{
                                 "handler": "reverse_proxy",
