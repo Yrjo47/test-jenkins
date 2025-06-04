@@ -1,6 +1,11 @@
 pipeline {
     agent any  // Simplified agent declaration
 
+    environment {
+        SERVER_PORT = "${3000 + (env.CHANGE_ID ? env.CHANGE_ID.toInteger() : 0)}"
+        REDIS_PORT = "${6000 + (env.CHANGE_ID ? env.CHANGE_ID.toInteger() : 0)}"
+    }
+
     options {
         // More comprehensive build retention
         buildDiscarder logRotator(
@@ -28,23 +33,16 @@ pipeline {
             when {
                 changeRequest()
             }
-            environment {
-                SERVER_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
-                REDIS_PORT = "${6000 + env.CHANGE_ID.toInteger()}"
-            }
             steps {
-                sh 'echo "starting services..."'
+                echo 'starting services...'
                 sh """
-                    COMPOSE_PROJECT_NAME=project-${GIT_BRANCH} SERVER_PORT=${PLATFORM_PORT} REDIS_PORT=${} docker compose up -d --build
+                    COMPOSE_PROJECT_NAME="project-${GIT_BRANCH} SERVER_PORT=${SERVER_PORT} REDIS_PORT=${REDIS_PORT} docker compose up -d --build
                 """
             }
         }
         stage('Create a dedicated caddy domain') {
             when {
                 changeRequest()
-            }
-            environment {
-                SERVER_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
             }
             steps {
                 script {
