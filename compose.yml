@@ -27,5 +27,8 @@ services:
     volumes:
       - redis:/data
 
+volumes:
+  redis:
+
 
   
