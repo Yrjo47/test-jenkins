@@ -16,19 +16,12 @@ pipeline {
     }
 
     stages {
-        stage('For all branches') {
-            steps {
-                sh "echo 'hello'"
-            }
-        }
-        stage('For PR branches') {
+        stage('For non-PR branches') {
             when {
-                changeRequest()
+                not { changeRequest() }
             }
             steps {
-                sh """
-                    echo "I'm a ${GIT_BRANCH} PR branch with a ${CHANGE_ID} number. I will be available locally on port ${env.PLATFORM_PORT}"
-                """
+                echo 'A new non-PR branch was created'
             }
         }
         stage('Start services') {
@@ -36,12 +29,13 @@ pipeline {
                 changeRequest()
             }
             environment {
-                PLATFORM_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
+                SERVER_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
+                REDIS_PORT = "${6000 + env.CHANGE_ID.toInteger()}"
             }
             steps {
                 sh 'echo "starting services..."'
                 sh """
-                    HOST_PORT=${PLATFORM_PORT} BRANCH_NAME=${GIT_BRANCH} docker compose up -d --build
+                    COMPOSE_PROJECT_NAME=project-${GIT_BRANCH} SERVER_PORT=${PLATFORM_PORT} REDIS_PORT=${} docker compose up -d --build
                 """
             }
         }
@@ -50,7 +44,7 @@ pipeline {
                 changeRequest()
             }
             environment {
-                PLATFORM_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
+                SERVER_PORT = "${3000 + env.CHANGE_ID.toInteger()}"
             }
             steps {
                 script {
@@ -67,7 +61,7 @@ pipeline {
                                 "match": [{"host": ["${GIT_BRANCH}.localhost"]}],
                                 "handle": [{
                                 "handler": "reverse_proxy",
-                                "upstreams": [{"dial": ":${PLATFORM_PORT}"}]
+                                "upstreams": [{"dial": ":${SERVER_PORT}"}]
                                 }]
                             }'
                         else

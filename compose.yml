@@ -1,11 +1,31 @@
-name: test-compose
-
 services:
   service1: 
-    container_name: service1-container-${BRANCH_NAME}
+    container_name: ${COMPOSE_PROJECT_NAME}-server
     image: nginx
     ports:
-      - "127.0.0.1:${HOST_PORT}:80"
+      - "127.0.0.1:${SERVER_PORT}:80"
+    restart: unless-stopped
+
+    depends_on:  
+      redis:
+        condition: service_healthy
+
+
+  redis:
+    image: docker.io/library/redis:alpine
+    command: --save 60 1 --loglevel warning
+    restart: unless-stopped
+    container_name: ${COMPOSE_PROJECT_NAME}-redis
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    ports:
+      - 127.0.0.1:${REDIS_PORT}:6379
+    volumes:
+      - redis:/data
 
 
   
