@@ -36,7 +36,7 @@ pipeline {
             steps {
                 echo 'starting services...'
                 sh """
-                    COMPOSE_PROJECT_NAME="project-${GIT_BRANCH} SERVER_PORT=${SERVER_PORT} REDIS_PORT=${REDIS_PORT} docker compose up -d --build
+                    COMPOSE_PROJECT_NAME="project-${GIT_BRANCH}" SERVER_PORT=${SERVER_PORT} REDIS_PORT=${REDIS_PORT} docker compose up -d --build
                 """
             }
         }
