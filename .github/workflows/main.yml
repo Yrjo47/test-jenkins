@@ -1,7 +1,7 @@
 name: Trigger Jenkins on PR Open
 on:
   pull_request:
-    types: [opened]  # Only runs when a PR is opened
+    types: [opened, edited, reopened, synchronize]  # Only runs when a PR is opened
 
 jobs:
   trigger-jenkins:
