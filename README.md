@@ -29,7 +29,7 @@ For each active PR (including updated ones):
 3. **Service Ports**:
    - Unique ports are assigned to avoid conflicts:
      - Nats service: `6000 + PR number`
-     - Platform services: `3000 + PR number`
+     - Platform service: `3000 + PR number`
 
 ### 3. Cleanup for Closed/Deleted PRs
 

@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Delete services') {
+            steps {
+                echo "Services for ${SOURCE_PROJECT_NAME} will be deleted"
+                script {
+                    sh """
+                        project_name="project-\$(echo ${SOURCE_PROJECT_NAME} | tr '[:upper:]' '[:lower:]')"
+                        docker compose -p \$project_name down --volumes
+                """
+                }
+            }
+        }
+        stage('Create the dedicated caddy domain') {
+            steps {
+                echo "${GIT_BRANCH}.localhost will be deleted"
+                script {
+                    sh """
+                        response=\$(curl -s -o /dev/null -w "%{http_code}" \
+                        "http://localhost:2019/id/${SOURCE_PROJECT_NAME}")
+
+                        if [ "\$response" -eq 404 ]; then
+                            echo "Couldn't find the route http://localhost:2019/id/${SOURCE_PROJECT_NAME}"
+                        else
+                            curl -X DELETE "http://localhost:2019/id/${SOURCE_PROJECT_NAME}"
+                        fi
+                    """
+                }
+                echo "${GIT_BRANCH}.localhost deleted"
+            }
+        }
+    }
+}

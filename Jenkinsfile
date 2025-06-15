@@ -8,8 +8,8 @@ pipeline {
 
     options {
         buildDiscarder logRotator(
-            artifactDaysToKeepStr: '',
-            artifactNumToKeepStr: '5',
+            artifactDaysToKeepStr: '5',
+            artifactNumToKeepStr: '',
             daysToKeepStr: '5'
         )
         disableConcurrentBuilds()
@@ -19,14 +19,6 @@ pipeline {
     }
 
     stages {
-        stage('For non-PR branches') {
-            when {
-                not { changeRequest() }
-            }
-            steps {
-                echo 'A new non-PR branch was created'
-            }
-        }
         stage('Start services') {
             when {
                 changeRequest()
@@ -47,14 +39,14 @@ pipeline {
                 script {
                     sh """
                         response=\$(curl -s -o /dev/null -w "%{http_code}" \
-                        "http://localhost:2019/id/${CHANGE_ID}")
+                        "http://localhost:2019/id/${GIT_BRANCH}")
 
                         if [ "\$response" -eq 404 ]; then
                             echo "Creating new Caddy route..."
                             curl -X POST "http://localhost:2019/config/apps/http/servers/srv0/routes" \
                             -H "Content-Type: application/json" \
                             -d '{
-                                "@id": "${CHANGE_ID}",
+                                "@id": "${GIT_BRANCH}",
                                 "match": [{"host": ["${GIT_BRANCH}.localhost"]}],
                                 "handle": [{
                                 "handler": "reverse_proxy",
