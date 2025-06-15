@@ -1,21 +1,19 @@
 pipeline {
-    agent any  // Simplified agent declaration
+    agent any
 
     environment {
         SERVER_PORT = "${3000 + (env.CHANGE_ID ? env.CHANGE_ID.toInteger() : 0)}"
-        REDIS_PORT = "${6000 + (env.CHANGE_ID ? env.CHANGE_ID.toInteger() : 0)}"
+        NATS_PORT = "${6000 + (env.CHANGE_ID ? env.CHANGE_ID.toInteger() : 0)}"
     }
 
     options {
-        // More comprehensive build retention
         buildDiscarder logRotator(
-            artifactDaysToKeepStr: '',  // Keep artifacts for 7 days
-            artifactNumToKeepStr: '5',   // Keep last 5 artifacts
-            daysToKeepStr: '5'         // Keep build records for 14 days
+            artifactDaysToKeepStr: '',
+            artifactNumToKeepStr: '5',
+            daysToKeepStr: '5'
         )
         disableConcurrentBuilds()
 
-        // Consider adding these common options:
         timeout(time: 30, unit: 'MINUTES')
         timestamps()
     }
@@ -36,7 +34,7 @@ pipeline {
             steps {
                 echo 'starting services...'
                 sh """
-                    COMPOSE_PROJECT_NAME="project-pr-${CHANGE_ID}" SERVER_PORT=${SERVER_PORT} REDIS_PORT=${REDIS_PORT} docker compose up -d --build
+                    COMPOSE_PROJECT_NAME="project-pr-${CHANGE_ID}" SERVER_PORT=${SERVER_PORT} NATS_PORT=${NATS_PORT} docker compose up -d --build
                 """
             }
         }

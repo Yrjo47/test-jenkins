@@ -23,7 +23,7 @@ services:
       retries: 5
       timeout: 3s
     ports:
-      - 127.0.0.1:${REDIS_PORT}:6379
+      - 127.0.0.1:${NATS_PORT}:6379
     volumes:
       - redis:/data
 
