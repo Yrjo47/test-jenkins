@@ -32,7 +32,7 @@ pipeline {
                 changeRequest()
             }
             steps {
-                echo 'starting services...'
+                echo "Trying to start services for ${GIT_BRANCH}..."
                 sh """
                     COMPOSE_PROJECT_NAME="project-pr-${CHANGE_ID}" SERVER_PORT=${SERVER_PORT} NATS_PORT=${NATS_PORT} docker compose up -d --build
                 """
@@ -43,6 +43,7 @@ pipeline {
                 changeRequest()
             }
             steps {
+                echo "Trying to create a dedicated domain for ${GIT_BRANCH}..."
                 script {
                     sh """
                         response=\$(curl -s -o /dev/null -w "%{http_code}" \
