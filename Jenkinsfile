@@ -26,7 +26,10 @@ pipeline {
             steps {
                 echo "Trying to start services for ${GIT_BRANCH}..."
                 sh """
-                    COMPOSE_PROJECT_NAME="project-pr-${CHANGE_ID}" SERVER_PORT=${SERVER_PORT} NATS_PORT=${NATS_PORT} docker compose up -d --build
+                    export COMPOSE_PROJECT_NAME="project-pr-${CHANGE_ID}" SERVER_PORT=${SERVER_PORT} NATS_PORT=${NATS_PORT}
+                    docker compose run -rm --no-deps --build platform_hh_worker
+                    docker compose run -rm --no-deps --build platform_server
+                    docker compose run -rm --no-deps --build platform_llm_worker
                 """
             }
         }
@@ -39,15 +42,15 @@ pipeline {
                 script {
                     sh """
                         response=\$(curl -s -o /dev/null -w "%{http_code}" \
-                        "http://localhost:2019/id/${GIT_BRANCH}")
+                        "http://localhost:2019/id/platform-${GIT_BRANCH}")
 
                         if [ "\$response" -eq 404 ]; then
                             echo "Creating new Caddy route..."
                             curl -X POST "http://localhost:2019/config/apps/http/servers/srv0/routes" \
                             -H "Content-Type: application/json" \
                             -d '{
-                                "@id": "${GIT_BRANCH}",
-                                "match": [{"host": ["${GIT_BRANCH}.localhost"]}],
+                                "@id": "platform-${GIT_BRANCH}",
+                                "match": [{"host": ["platform-${GIT_BRANCH}.localhost"]}],
                                 "handle": [{
                                 "handler": "reverse_proxy",
                                 "upstreams": [{"dial": ":${SERVER_PORT}"}]
@@ -58,7 +61,7 @@ pipeline {
                         fi
                     """
                 }
-                echo "The app is running on https://${GIT_BRANCH}.localhost"
+                echo "The app is running on https://platform-${GIT_BRANCH}.localhost"
             }
         }
     }
